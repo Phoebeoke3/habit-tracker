@@ -2,7 +2,7 @@
 
 class User:
     '''This is the user class'''
-
+    habits = []
     def __init__(self, id, username, email, password):
         self.username = username
         self.email = email
