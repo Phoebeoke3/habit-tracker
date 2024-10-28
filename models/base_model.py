@@ -4,7 +4,7 @@ from uuid import uuid4
 import models
 
 class BaseModel:
-    '''This is the user class'''
+    '''This is the base class'''
 
     def __init__(self):
        self.id = str(uuid4())

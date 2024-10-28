@@ -1,10 +1,14 @@
 '''This is the habit model'''
 
+from models.base_model import BaseModel
 
-class Habit:
+class Habit(BaseModel):
     '''This is the habit class'''
-    def __init__(self, id, name, description, frequency, streak_count):
-        self.id = id
+
+    __table_name__= "habits"
+
+    def __init__(self, name, description, frequency, streak_count):
+        super().__init__()
         self.name = name
         self.description = description
         self.frequency = frequency

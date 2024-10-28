@@ -50,3 +50,29 @@ class MySQLStorage:
         self.connection.commit()
     
     # def create_table(self,obj):
+
+    def all(self, table_name):
+        '''This method fetches all entities in the database '''
+        query = f'SELECT * FROM {table_name};'
+
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+        # for x in result:
+        #     print(x)       
+        return result 
+#         import mysql.connector
+
+# mydb = mysql.connector.connect(
+#   host="localhost",
+#   user="yourusername",
+#   password="yourpassword",
+#   database="mydatabase"
+# )
+
+# mycursor = mydb.cursor()
+
+# mycursor.execute("SELECT * FROM customers")
+
+# myresult = mycursor.fetchall()
+

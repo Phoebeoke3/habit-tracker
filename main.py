@@ -1,17 +1,69 @@
-from models.user import User
+import typer
+from controllers.user_controllers import get_all_users
+from rich.console import Console
+from rich.table import Table
 
-# edafe = User('EDAFE','edafe@gmail.com','eDafepassword')
-# print(edafe)
-from models.habit import Habit
+# Initialize the Typer app
+app = typer.Typer()
 
-# new_habit = Habit(id= 1, name='exercise', description='running', frequency='daily', streak_count=5)
-# print(new_habit)
+# initialize Console object
+console = Console()
 
-from models.user import User
-from models.completion_record import Completion_record
-from datetime import datetime
-new_completion = Completion_record(id= 1, habit_id= 1, completion_date=datetime.utcnow())
+# Define a command to greet users
+@app.command()
+def greet(name: str):
+    """
+    Greet a user.
+    """
+    typer.echo(f"Hello {name}!")
 
-# print(new_completion)
-nero = User("nero1", "nero1@gmail.com", "" )
-nero.save()
+# Define a command to add two numbers
+@app.command()
+def add(a: int, b: int):
+    """
+    Add two numbers.
+    """
+    result = a + b
+    typer.echo(f"The result of {a} + {b} is {result}")
+
+@app.command()
+def user(name: str):
+    '''This function gets all objects based on table name'''
+    
+    if not name:
+        typer.echo("object name required")
+        return 
+    table = Table(title="Users")
+    table.add_column("id")
+    table.add_column("username")
+    table.add_column("email")
+    users = get_all_users()
+    for user in users:
+        # typer.echo(dict(user))
+        table.add_row(user[0], user[1], user[2])
+    console.print(table)
+# Interactive mode
+def interactive_mode():
+    """
+    Start interactive mode.
+    """
+    while True:
+        # Prompt user for input command
+        command = input("Enter command (or type 'exit' to quit): ").strip().split()
+
+        if not command:
+            continue
+        elif command[0] == "exit":
+            typer.echo("Exiting interactive mode.")
+            break
+        else:
+            try:
+                # Execute the commands by passing the list of commands to typer
+                app(command)
+            except SystemExit:
+                # Catch SystemExit to prevent the app from stopping the loop
+                pass
+
+if __name__ == "__main__":
+    # Start in interactive mode
+    interactive_mode()
