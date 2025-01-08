@@ -2,6 +2,7 @@
 
 from views.auth_views import auth_view
 from rich.console import Console
+from views.main_views import main_veiw
 
 console = Console()
 
@@ -16,5 +17,6 @@ def app_view(session):
         if not user:
             user = auth_view()
         else:
-            input("Press enter to enter infinite loop")
+            main_veiw(user)
+            input()
 
