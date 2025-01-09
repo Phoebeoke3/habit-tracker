@@ -31,7 +31,7 @@ To install Habit Tracker , follow these steps:
     ```
 3. Setup virtual environment: 
 
-For Windows:
+    For Windows:
     
     ```bash
     python -m venv venv
@@ -39,7 +39,7 @@ For Windows:
     
     ```
 
-For Mac/ Linux:
+    For Mac/ Linux:
 
      ```bash
     python -m venv venv
