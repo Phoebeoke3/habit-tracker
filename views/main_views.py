@@ -9,7 +9,7 @@ import sys
 
 console = Console()
 
-def main_veiw(user):
+def main_view(user):
     '''This is the main view function after authentication '''
     
     console.clear()
