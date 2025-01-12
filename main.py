@@ -21,47 +21,5 @@ if __name__ == "__main__":
     user = get_session()
     app_view(user)
     
-def run():
-    user = None
-    with open("session.json", "r") as f:
-        user = json.load(f)
 
-    if not user:
-        user = auth_view()
-
-    if not user:
-        print("[red]Authentication failed![/red]")
-        return
-    else:
-        while True:
-            main_view()
-            command = input("Enter a command: ")
-            if command == "help":
-                help_view()
-            elif command == "exit":
-                break
-            elif command == "quit":
-                break
-            elif command == "clear":
-                console.clear()
-            elif command == "0":
-                console.clear()
-                logout()
-                user = None
-                user = auth_view()
-                if user:
-                    continue
-            elif command == "1":
-                app_view(user["id"])
-            else:
-                print("\n[yellow]Command not found[/yellow]")
-        print("Goodbye!")
-
-if __name__ == "__main__":
-    run()
-    from db import conn
-    conn.close()
-
-if __name__ == "__main__":
-    user = get_session()
-    app_view(user)
+   

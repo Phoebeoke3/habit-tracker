@@ -4,6 +4,8 @@ from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table
 from rich import print
+from controllers.auth_controllers import logout
+from views.habit_views import habits_view, add_habit_view, edit_habit_view, delete_habit_view
 import sys
 
 
@@ -21,10 +23,20 @@ def main_view(user):
     print("\n")
     help_view()
     command = input("Enter a command: ") 
-
-    if command == "exit":
+    user_id = str(user["id"])
+    if command == "exit" or command == "quit":
         sys.exit()
-    
+    elif command == "logout" or command == "0":
+        logout()
+        return None
+    elif command == "1":
+        habits_view(user_id)
+    elif command == "2":
+        add_habit_view(user_id)
+    elif command == "3":
+        edit_habit_view(user_id)
+        
+    return user    
 
 def help_view():
     '''This function shows a list of command a user can enter '''

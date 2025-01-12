@@ -20,16 +20,21 @@ def login(username, password):
         json_user = json.dumps(user_dict) #Convert user object to json
         with open("session.json", "w") as f:
             f.write(json_user)
-        return user
+        return user_dict
     return None
 
 def register(username, password):
+    '''Register function'''
+
     user = create_user(username, password)
     if user:
         return user
     return None
 
 def logout():
+    '''This function logs out th current user session '''
+
+
     with open("session.json", "w") as f:
         f.write("{}")
     return None
