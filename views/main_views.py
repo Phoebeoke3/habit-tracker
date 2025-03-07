@@ -5,7 +5,8 @@ from rich.prompt import Prompt
 from rich.table import Table
 from rich import print
 from controllers.auth_controllers import logout
-from views.habit_views import habits_view, add_habit_view, edit_habit_view, delete_habit_view
+from views.habit_views import habits_view, add_habit_view, edit_habit_view, delete_habit_view, track_habit_view
+from views.analytics_views import analytics_view
 import sys
 
 
@@ -35,6 +36,12 @@ def main_view(user):
         add_habit_view(user_id)
     elif command == "3":
         edit_habit_view(user_id)
+    elif command == "4":
+        delete_habit_view(user_id)
+    elif command == "5":
+        track_habit_view(user_id)
+    elif command == "6":
+        analytics_view(user_id)
         
     return user    
 
@@ -53,7 +60,7 @@ def help_view():
     table.add_row("3", "Edit Habit", "Edits a habit.")
     table.add_row("4", "Delete Habit", "Deletes a habit.")
     table.add_row("5", "Track Habit", "Tracks a habit.")
-    table.add_row("6", "View Stats", "Views stats.")
+    table.add_row("6", "Analyse Habit", "Habit Analyses.")
     table.add_row("help", "help", "List all usable commands in a tabular form.")
     table.add_row("clear", "clear", "Clears the screen.")
     table.add_row("exit", "exit", "Quits the program.")

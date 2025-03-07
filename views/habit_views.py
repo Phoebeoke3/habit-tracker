@@ -47,7 +47,13 @@ def edit_habit_view(user_id):
     console.rule("[cyan]Edit Habit[/cyan]")
     habits_view(user_id)
     habit_id = input("Enter the ID of the habit to edit: ")
-    habit = get_habit(habit_id)
+
+    try:
+        habit = get_habit(habit_id)
+    except Exception as e:
+        print(f"[red]{e}[/red]")
+        input("Press ENTER to continue")
+        return
     print("\n")
     print("The habit to be updated is: ")
     print(f"ID: {habit['id']}")
@@ -58,8 +64,8 @@ def edit_habit_view(user_id):
     print(f"Streak count: {habit['streak_count']}")
     print(f"Periodicity: {habit['periodicity']}")
     print("\n")
-    name = input("Name: ") or habit['name']
-    description = input("Description: ") or habit['description']
+    name = input("New name: ") or habit['name']
+    description = input("New description: ") or habit['description']
     periodicity = Prompt.ask("Enter periodicity: ", choices=["daily", "weekly", "monthly", "yearly"], default=habit['periodicity'])
     edit_habit(habit_id, name, description, periodicity)
     print(f"[green]Habit {habit_id} updated successfully![/green]")
@@ -85,16 +91,21 @@ def edit_habit_view(user_id):
         #     print("[red]Invalid choice![/red]")
     return periodicity
 
-def delete_habit_view():
-    '''This function '''
+def delete_habit_view(user_id):
+    '''This function deletes user habit '''
+
+    habits_view(user_id)
     console.rule("[bold]Delete Habit[/bold]")
     habit_id = Prompt.ask("Enter the ID of the habit to delete: ")
     delete_habit(habit_id)
     print(f"[green]Habit {habit_id} deleted successfully![/green]")
 
-def track_habit():
+def track_habit_view(user_id):
+    '''This function tracks the user habit'''
+    
+    habits_view(user_id)
     console.rule("[bold]Track Habit[/bold]")
-    habit_id = Prompt.ask("Enter the ID of the habit to markdone from the table above: ")
+    habit_id = Prompt.ask("Enter the ID of the habit to markdone from the table above ")
     mark_done(habit_id)
     print(f"[green]Habit {habit_id} tracked successfully![/green]")
     time.sleep(3)

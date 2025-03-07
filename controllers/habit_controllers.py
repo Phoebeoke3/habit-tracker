@@ -10,32 +10,59 @@ from models.habit import Habit
 from datetime import datetime
 
 def get_habit(habit_id):
-    sql = "SELECT * FROM habits WHERE id = ?"
-    cursor = conn.execute(sql, (habit_id,))
-    habit = cursor.fetchone()
+    '''This function is used to get habit by the habit id'''
 
-    return {
-        "id": habit[0],
-        "name": habit[1],
-        "description": habit[2],
-        "start_date": habit[3],
-        "user_id": habit[4],
-        "streak_count": habit[5],
-        "periodicity": habit[6]
-    }
+    try:
+        sql = "SELECT * FROM habits WHERE id = ?"
+        cursor = conn.execute(sql, (habit_id,))
+        habit = cursor.fetchone()
+
+        return {
+            "id": habit[0],
+            "name": habit[1],
+            "description": habit[2],
+            "start_date": habit[3],
+            "user_id": habit[4],
+            "streak_count": habit[5],
+            "periodicity": habit[6]
+        }
+    except:
+        raise Exception(f"Habit with ID {habit_id} is not found")
+    
 
 def get_habits_by_user_id(user_id):
-    sql = "SELECT * FROM habits WHERE user_id = ?"
-    cursor = conn.execute(sql, (user_id))
-    habits = cursor.fetchall()
-    return habits
+    '''This function gets habit by user id'''
+
+    try:
+        sql = "SELECT * FROM habits WHERE user_id = ?"
+        cursor = conn.execute(sql, (user_id))
+        habits = cursor.fetchall()
+        return habits
+    except:
+        raise Exception(f"User with ID {user_id} is not found")
+
+def get_habits_by_periodicity(user_id, periodicity):
+    '''This function gets habit by user id'''
+
+    try:
+        sql = "SELECT * FROM habits WHERE user_id = ? AND periodicity = ?"
+        cursor = conn.execute(sql, (user_id, periodicity))
+        habits = cursor.fetchall()
+        return habits
+    except:
+        raise Exception(f"User with ID {user_id} is not found")
+
 
 def create_habit(name, description, user_id, periodicity):
+    '''This is the controller function used to create habit '''
+
     habit = Habit(name, description, user_id, periodicity)
     habit.save()
     return habit
 
 def all_habits():
+    '''This is the controller function to returns all the user habit'''
+
     sql = "SELECT * FROM habits"
     cursor = conn.execute(sql)
     return cursor.fetchall()
