@@ -173,7 +173,6 @@ def analytics_menu_view():
     table.add_row("3", "Longest Habit Streak", "Return the longest run streak of all defined habits.")
     table.add_row("4", "Habit Streak", "Return the longest run streak for a given habit.")
     table.add_row("help", "help", "List all usable commands in a tabular form.")
-    table.add_row("clear", "clear", "Clears the screen.")
     table.add_row("exit", "exit", "Quits the program.")
     table.add_row("quit", "quit", "Quits the program.")
     

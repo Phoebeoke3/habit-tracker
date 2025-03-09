@@ -33,16 +33,6 @@ def get_habit(habit_id):
         raise Exception(f"Habit with ID {habit_id} is not found")
     
 
-# def get_habits_by_user_id(user_id):
-#     '''This function gets habit by user id'''
-
-#     try:
-#         sql = "SELECT * FROM habits WHERE user_id = ?"
-#         cursor = conn.execute(sql, (user_id))
-#         habits = cursor.fetchall()
-#         return habits
-#     except:
-#         raise Exception(f"User with ID {user_id} is not found")
 def get_habits_by_user_id(user_id):
     '''Fetches all habits for a user, including predefined ones'''
     try:
