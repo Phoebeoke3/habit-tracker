@@ -5,10 +5,11 @@ A module containing all authentication controllers
 
 import json
 from controllers.user_controllers import get_user_by_username, create_user
-
+from controllers.habit_controllers import assign_predefined_habits
+from controllers.user_controllers import create_user  
 
 def login(username, password):
-    """Login function"""
+    """This is the login function"""
 
     user = get_user_by_username(username)
     if user and user[2] == password:
@@ -23,13 +24,20 @@ def login(username, password):
         return user_dict
     return None
 
-def register(username, password):
-    '''Register function'''
 
+def register(username, password):
+    '''Registers a new user and assigns predefined habits'''
+    
     user = create_user(username, password)
     if user:
+        user_id = user["id"]  
+        assign_predefined_habits(user_id)  # Assign predefined habits to the new user
+        print(f"[green]User '{username}' registered successfully! Predefined habits assigned.[/green]")
         return user
-    return None
+    else:
+        print("[red]Registration failed. Try again.[/red]")
+        return None
+
 
 def logout():
     '''This function logs out th current user session '''

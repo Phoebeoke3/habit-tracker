@@ -6,7 +6,8 @@ from rich.live import Live
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
-from controllers.analytics import all_habits_by_periodicity, get_all_tracked_habits, longest_habit_streak
+from controllers.habit_controllers import get_habits_by_user_id
+from controllers.analytics import all_habits_by_periodicity, get_all_tracked_habits, longest_habit_streak, get_longest_streak
 import sys
 
 console = Console()
@@ -15,11 +16,10 @@ def analytics_view(user_id):
     '''This is the main view function after authentication '''
     
     console.clear()
-    # username = user.username
+    
     print("\n")
     print(f"[cyan]Analyse Habit [/cyan]".center(100))
-    # print("Enter [green]help[/green] for a list of commands!".center(100))
-    # print(user)
+   
     print("\n")
     analytics_menu_view()
     command = input("Enter a command: ") 
@@ -38,13 +38,10 @@ def analytics_view(user_id):
         longest_habit_streak_view(user_id)
         
     elif command == "4":
-        # delete_habit_view(user_id)
-        pass
-    elif command == "5":
-        # track_habit_view(user_id)
-        pass
+       view_longest_streak(user_id)
+
+   
         
-    # return user    
 def tracked_habits_view(user_id):
     '''This function shows the table of currently tracked user habits'''
 
@@ -56,8 +53,9 @@ def tracked_habits_view(user_id):
     table.add_column("Start date")
     table.add_column("Streak count")
     table.add_column("Periodicity")
+    table.add_column("Last Completed Date")
     for habit in habits:
-        table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6])
+        table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6], habit[7])
     print(table)
     input("Press ENTER to continue")
 
@@ -66,7 +64,7 @@ def habit_periodicity_view(user_id):
     '''This function is the view that returns a list of all habits with the same periodicity for a particular user'''
 
     console.rule("[cyan]Get Habit Based on Periodicity[/cyan]")
-    # habits_view(user_id)
+    
     periodicity = Prompt.ask("Enter periodicity: ", choices=["daily", "weekly", "monthly", "yearly"], default="daily")
 
     try:
@@ -78,8 +76,9 @@ def habit_periodicity_view(user_id):
         table.add_column("Start date")
         table.add_column("Streak count")
         table.add_column("Periodicity")
+        table.add_column("Last Completed Date")
         for habit in habits:
-            table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6])
+            table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6], habit[7])
         print(table)
     except Exception as e:
         print(f"[red]{e}[/red]")
@@ -93,16 +92,70 @@ def longest_habit_streak_view(user_id):
 
     try:
         habit = longest_habit_streak(user_id)
-        print("[cyan]Name:[/cyan]", habit[1], sep="\t")
-        print("[cyan]Description:[/cyan]", habit[2], sep="\t")
-        print("[cyan]Date:[/cyan]", habit[3], sep="\t")
-        print("[cyan]Streak Count:[/cyan]", habit[5], sep="\t")
-        input()
+
+        table = Table(title="", show_lines=True)
+        table.add_column("Name", style="bold cyan")
+        table.add_column("Description", style="italic magenta")
+        table.add_column("Date", style="green")
+        table.add_column("Streak Count", style="bold yellow")
+        table.add_column("Periodicity", style="bold blue")
+        table.add_column("Last Completed Date", style="bold green")
+
+        table.add_row(habit[1], habit[2], habit[3], str(habit[5]), str(habit[6]), str(habit[7]))
+
+        console.print(table)
+       
+        # print("[cyan]Name:[/cyan]", habit[1], sep="\t")
+        # print("[cyan]Description:[/cyan]", habit[2], sep="\t")
+        # print("[cyan]Date:[/cyan]", habit[3], sep="\t")
+        # print("[cyan]Streak Count:[/cyan]", habit[5], sep="\t")
+        # input()
     except Exception as e:
         print(f"[red]{e}[/red]")
     input("Press ENTER to continue")
     return
 
+def view_longest_streak(user_id):
+    '''This function view that return the longest run streak of a given habit'''
+
+    console.rule("[cyan]Longest streak[/cyan]")
+    # Fetch all habits for the user
+    habits = get_habits_by_user_id(user_id)
+
+    table = Table(title="Habits")
+    table.add_column("ID", justify="center", style="cyan", no_wrap=True)
+    table.add_column("Name", style="magenta")
+    table.add_column("Description", style="green")
+    table.add_column("Start Date", style="cyan")
+    table.add_column("Streak Count", justify="center", style="yellow")
+    table.add_column("Periodicity", justify="center", style="blue")
+    table.add_column("Last Completion Date", style="green")
+
+    for habit in habits:
+            table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6], habit[7])
+    console.print(table)
+    if not habits:
+        print("[red]No habits found for this user.[/red]")
+        # return
+
+    try:
+        # Prompt user for habit ID
+        habit_id = input("\nEnter the habit ID to check longest streak: ").strip()
+
+        if not habit_id.isdigit():
+            print("[red]Invalid input. Please enter a valid numeric Habit ID.[/red]")
+            input("\nPress ENTER to return to analytics menu...")  # Pause
+            return  # Exit function early
+
+        habit_id = int(habit_id)
+        longest_streak = get_longest_streak(habit_id)
+
+        print(f"\n[green]Longest streak for Habit ID {habit_id}: {longest_streak} days[/green]")
+        input("\nPress ENTER to return to main menu...")  # Pause before returning
+
+    except Exception as e:
+        print(f"[red]Error: {e}[/red]")  # Show error message
+        input("\nPress ENTER to return to main menu...")  # Pause before returning
 
 
 def analytics_menu_view():

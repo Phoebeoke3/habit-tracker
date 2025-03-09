@@ -1,7 +1,7 @@
 """
 A module containing all user controllers (funtions that processes user data)
 """
-
+import sqlite3
 from db import conn
 from rich.table import Table
 from rich.console import Console
@@ -23,10 +23,39 @@ def get_user_by_username(username):
     user = cursor.fetchone()
     return user
 
+# def create_user(username, password):
+#     user = User(username, password)
+#     user.save()
+#     return user
+
+
+
+import sqlite3
+from db import conn
+
 def create_user(username, password):
-    user = User(username, password)
-    user.save()
-    return user
+    '''Creates a new user only if the username is not already taken'''
+    
+    cursor = conn.cursor()
+
+    # Check if the username already exists
+    cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+    existing_user = cursor.fetchone()
+
+    if existing_user:
+        print(f"[red]Error: Username '{username}' is already taken. Please choose another one.[/red]")
+        return None  # Return None to indicate registration failure
+
+    # Insert new user if username is unique
+    sql = "INSERT INTO users (username, password) VALUES (?, ?)"
+    cursor.execute(sql, (username, password))
+    conn.commit()
+
+    # Retrieve the new user ID
+    user_id = cursor.lastrowid
+
+    return {"id": user_id, "username": username}  # Return user as a dictionary
+
 
 def update_user(user_id, username, password):
     user = User(username, password)

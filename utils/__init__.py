@@ -4,6 +4,6 @@ def sort_habits(habits):
 
   def sort_key(habit):
     '''This is the sort key function'''
-    return habit[5] #This return the streak count, which have the index number "5" in the habit tuple
+    return habit[5] #This return the streak count, streak count have the index number "5" in the habit tuple
     
   return habits.sort(key=sort_key)

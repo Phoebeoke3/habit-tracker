@@ -1,7 +1,8 @@
 '''This is the analytics module, it allows users to analyse their habit'''
 
 
-from controllers.habit_controllers import get_habits_by_periodicity, get_habits_by_user_id
+from controllers.habit_controllers import get_habits_by_periodicity, get_habits_by_user_id, get_longest_streak
+from datetime import datetime, timedelta
 from utils import sort_habits
 
 def get_all_tracked_habits(user_id):
@@ -21,14 +22,16 @@ def longest_habit_streak(user_id):
     '''This function return the longest run streak of all defined habits'''
 
     all_habits = get_habits_by_user_id(user_id)
-    # print(all_habits)
+    
     sorted_by_streak = sorted(all_habits, key=lambda tup: tup[5], reverse=True)
     return sorted_by_streak[0]
 
 
-    
-
-
-def habit_streak():
+def view_longest_streak():
     '''This function return the longest run streak for a given habit'''
+
+    habit_id = input("Enter the habit ID: ")
+    longest_streak = get_longest_streak(habit_id)
     
+    print(f"[green]Longest streak for habit {habit_id}: {longest_streak} days[/green]")
+

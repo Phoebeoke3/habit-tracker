@@ -6,9 +6,10 @@ from rich.live import Live
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
-from controllers.habit_controllers import get_habits_by_user_id, create_habit, edit_habit, delete_habit, mark_done, get_habit
+from controllers.habit_controllers import get_habits_by_user_id, create_habit, edit_habit, delete_habit, mark_done, get_habit, get_longest_streak
 import time
 import sys
+import json
 
 console = Console()
 
@@ -37,13 +38,14 @@ def add_habit_view(user_id):
     description = input("Description: ")
     periodicity = Prompt.ask("Enter periodicity: ", choices=["daily", "weekly", "monthly", "yearly"], default="daily")
     new_habit = create_habit(name, description, user_id, periodicity)
-    print(f"[green]Habit {new_habit.name} created successfully![/green]")
-    time.sleep(3)
+    print(f"[green]Habit {new_habit['name']} created successfully![/green]")
+
+    input("Press Enter to Continue")
 
 def edit_habit_view(user_id):
     '''This function is used to edit user habit'''
 
-    # console.clear()
+    
     console.rule("[cyan]Edit Habit[/cyan]")
     habits_view(user_id)
     habit_id = input("Enter the ID of the habit to edit: ")
@@ -69,26 +71,7 @@ def edit_habit_view(user_id):
     periodicity = Prompt.ask("Enter periodicity: ", choices=["daily", "weekly", "monthly", "yearly"], default=habit['periodicity'])
     edit_habit(habit_id, name, description, periodicity)
     print(f"[green]Habit {habit_id} updated successfully![/green]")
-    # while True:
-        # print("1.\tdaily")
-        # print("2.\tweekly")
-        # print("3.\tmonthly")
-        # print("4.\tyearly")
-        # choice = input("Enter your choice: ")
-        # if choice == "1":
-        #     periodicity = "daily"
-        #     break
-        # elif choice == "2":
-        #     periodicity = "weekly"
-        #     break
-        # elif choice == "3":
-        #     periodicity = "monthly"
-        #     break
-        # elif choice == "4":
-        #     periodicity = "yearly"
-        #     break
-        # else:
-        #     print("[red]Invalid choice![/red]")
+    
     return periodicity
 
 def delete_habit_view(user_id):
@@ -96,7 +79,7 @@ def delete_habit_view(user_id):
 
     habits_view(user_id)
     console.rule("[bold]Delete Habit[/bold]")
-    habit_id = Prompt.ask("Enter the ID of the habit to delete: ")
+    habit_id = Prompt.ask("Enter the ID of the habit to delete ")
     delete_habit(habit_id)
     print(f"[green]Habit {habit_id} deleted successfully![/green]")
 
@@ -108,4 +91,34 @@ def track_habit_view(user_id):
     habit_id = Prompt.ask("Enter the ID of the habit to markdone from the table above ")
     mark_done(habit_id)
     print(f"[green]Habit {habit_id} tracked successfully![/green]")
-    time.sleep(3)
+    input()
+
+def display_habits(user_id):
+    '''Displays all habits, including predefined ones'''
+    
+    habits = get_habits_by_user_id(user_id)
+
+    if not habits:
+        print("[yellow]No habits found.[/yellow]")
+        return
+
+    table = Table(title="Your Habits")
+    table.add_column("ID", justify="center", style="cyan", no_wrap=True)
+    table.add_column("Name", style="magenta")
+    table.add_column("Description", style="green")
+    table.add_column("Periodicity", justify="center", style="blue")
+    table.add_column("Streak Count", justify="center", style="yellow")
+
+    for habit in habits:
+        table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]))
+
+    console = Console()
+    console.print(table)
+
+def view_longest_streak():
+    '''View of the longest run streak for a given habit'''
+
+    habit_id = input("Enter the habit ID: ")
+    longest_streak = get_longest_streak(habit_id)
+    print(f"[green]Longest streak for habit {habit_id}: {longest_streak} days[/green]")
+
