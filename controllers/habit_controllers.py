@@ -123,7 +123,9 @@ def mark_done(habit_id):
     sql = "SELECT * FROM habits WHERE id = ?"
     cursor = conn.execute(sql, (habit_id,))
     habit = cursor.fetchone()
-    print(habit)
+    if habit is None:  # ✅ Prevent NoneType error
+        print(f"[red]Habit with ID {habit_id} not found. Please check the habit ID and try again.[/red]")
+        return  # Stop execution if habit does not exist
     streak_count = habit[5]
     periodicty = habit[6]
     last_completed_date = habit[7]
@@ -133,7 +135,7 @@ def mark_done(habit_id):
         "monthly": 30,
         "yearly": 365
     }
-
+    
     if streak_count == 0:
         streak_count += 1
     elif last_completed_date and (datetime.now() - datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')).days > period[periodicty] and (datetime.now() - datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')).days <= period[periodicty] * 2:

@@ -43,45 +43,58 @@ def add_habit_view(user_id):
     input("Press Enter to Continue")
 
 def edit_habit_view(user_id):
-    '''This function is used to edit user habit'''
+    '''This function is used to edit a user habit'''
 
-    
     console.rule("[cyan]Edit Habit[/cyan]")
     habits_view(user_id)
-    habit_id = input("Enter the ID of the habit to edit: ")
+    habit_id = input("Enter the ID of the habit to edit: ").strip()
 
-    try:
-        habit = get_habit(habit_id)
-    except Exception as e:
-        print(f"[red]{e}[/red]")
-        input("Press ENTER to continue")
-        return
-    print("\n")
-    print("The habit to be updated is: ")
+    if not habit_id:
+        print("[red]Invalid habit ID provided.[/red]")
+        return None
+
+    habit = get_habit(habit_id)
+    if habit is None:
+        print(f"[red]Habit with ID {habit_id} not found.[/red]")
+        return None  # ✅ Prevent returning None
+
+    print("\nEditing habit:")
     print(f"ID: {habit['id']}")
     print(f"Name: {habit['name']}")
     print(f"Description: {habit['description']}")
-    print(f"Start date: {habit['start_date']}")
-    print(f"User ID: {habit['user_id']}")
-    print(f"Streak count: {habit['streak_count']}")
     print(f"Periodicity: {habit['periodicity']}")
-    print("\n")
+
     name = input("New name: ") or habit['name']
     description = input("New description: ") or habit['description']
     periodicity = Prompt.ask("Enter periodicity: ", choices=["daily", "weekly", "monthly", "yearly"], default=habit['periodicity'])
+
     edit_habit(habit_id, name, description, periodicity)
     print(f"[green]Habit {habit_id} updated successfully![/green]")
-    
-    return periodicity
+
+    return periodicity  # ✅ Always return periodicity
+
+
 
 def delete_habit_view(user_id):
-    '''This function deletes user habit '''
+    '''This function deletes a user habit'''
 
     habits_view(user_id)
     console.rule("[bold]Delete Habit[/bold]")
-    habit_id = Prompt.ask("Enter the ID of the habit to delete ")
-    delete_habit(habit_id)
-    print(f"[green]Habit {habit_id} deleted successfully![/green]")
+    habit_id = Prompt.ask("Enter the ID of the habit to delete ").strip()
+
+    if not habit_id:
+        print("[red]Invalid habit ID entered.[/red]")
+        return
+
+    if not get_habit(habit_id):  # ✅ Ensure habit exists before deleting
+        print(f"[red]Habit with ID {habit_id} not found.[/red]")
+        return
+
+    try:
+        delete_habit(habit_id)
+        print(f"[green]Habit {habit_id} deleted successfully![/green]")
+    except Exception as e:
+        print(f"[red]Error deleting habit: {e}[/red]")
 
 def track_habit_view(user_id):
     '''This function tracks the user habit'''
