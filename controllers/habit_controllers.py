@@ -1,4 +1,3 @@
-
 """
 A module containing all habit controllers (funtions that processes habit data)
 """
@@ -126,8 +125,9 @@ def mark_done(habit_id):
     if habit is None:  # ✅ Prevent NoneType error
         print(f"[red]Habit with ID {habit_id} not found. Please check the habit ID and try again.[/red]")
         return  # Stop execution if habit does not exist
+    
     streak_count = habit[5]
-    periodicty = habit[6]
+    periodicity = habit[6]  # Fixed typo here
     last_completed_date = habit[7]
     period = {
         "daily": 1,
@@ -136,18 +136,48 @@ def mark_done(habit_id):
         "yearly": 365
     }
     
-    if streak_count == 0:
-        streak_count += 1
-    elif last_completed_date and (datetime.now() - datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')).days > period[periodicty] and (datetime.now() - datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')).days <= period[periodicty] * 2:
-        streak_count += 1
-    elif last_completed_date and (datetime.now() - datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')).days > period[periodicty] * 2:
-        streak_count = 0
+    # If no previous completion date or streak is 0, start a new streak
+    if streak_count == 0 or last_completed_date is None:
+        streak_count = 1
     else:
-        print("[yellow]Habit already completed today![/yellow]")
-        return
+        try:
+            # Try to parse the datetime - handle potential format variations
+            try:
+                last_date = datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')
+            except ValueError:
+                # Alternative format without microseconds
+                last_date = datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S')
+                
+            days_since_completion = (datetime.now() - last_date).days
+            
+            # Within period - already completed
+            if days_since_completion < 1:
+                print("[yellow]Habit already completed today![/yellow]")
+                return
+                
+            # Completed within period - continue streak
+            elif days_since_completion <= period[periodicity]:
+                streak_count += 1
+                
+            # Missed one period but not two - reset streak
+            elif days_since_completion <= period[periodicity] * 2:
+                streak_count = 1
+                
+            # Missed more than two periods - reset streak
+            else:
+                streak_count = 1
+                
+        except Exception as e:
+            print(f"[red]Error processing date: {e}[/red]")
+            # Start a new streak if there's any date parsing issue
+            streak_count = 1
+    
+    # Update the database
     sql = "UPDATE habits SET streak_count = ?, last_completed_date = ? WHERE id = ?"
-    cursor = conn.execute(sql, (streak_count, datetime.now(), habit_id))
+    conn.execute(sql, (streak_count, datetime.now(), habit_id))
     conn.commit()
+    
+    print(f"[green]Habit marked as done! Current streak: {streak_count}[/green]")
 
 
 

@@ -16,6 +16,7 @@ def get_session():
     except FileNotFoundError as e:
         with open(SESSION_PATH, 'w') as file:
             file.write(json.dumps({}))
+        user = {}  # Set user to empty dict after creating the file
     return user
 
 def set_session(user):
