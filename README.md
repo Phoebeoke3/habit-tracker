@@ -58,3 +58,18 @@ To install Habit Tracker , follow these steps:
     ```bash
     python main.py
     ```
+
+## Testing
+
+For testing, a unittest file has been created which can be run by running pytest from command line.
+
+These test covers:
+
+-Habit creation and initialization
+-Data retrieval and filtering
+-Streak tracking and calculations
+-Database operations
+-Analytics functionality
+-Data sorting and organization
+-Error handling
+-Date/time handling
