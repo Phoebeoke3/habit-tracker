@@ -5,6 +5,7 @@ import sqlite3
 import json
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
+import tempfile
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -185,3 +186,46 @@ def four_weeks_habit_data():
             "expected_max_streak": 2
         }
     } 
+
+@pytest.fixture
+def test_db():
+    """Create a temporary test database."""
+    # Create a temporary file
+    fd, path = tempfile.mkstemp()
+    
+    # Create test database
+    test_conn = sqlite3.connect(path)
+    cursor = test_conn.cursor()
+    
+    # Create required tables
+    cursor.execute('''CREATE TABLE users
+        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username text NOT NULL UNIQUE,
+        password text NOT NULL)''')
+        
+    cursor.execute('''CREATE TABLE habits
+        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name text NOT NULL,
+        description text NOT NULL,
+        start_date text NOT NULL,
+        user_id INTEGER NOT NULL,
+        streak_count INTEGER NOT NULL,
+        periodicity text NOT NULL,
+        last_completed_date text,
+        FOREIGN KEY (user_id) REFERENCES users(id))''')
+        
+    cursor.execute('''CREATE TABLE streak_count
+        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        habit_id INTEGER NOT NULL,
+        count INTEGER,
+        last_completed_date TEXT NOT NULL,
+        FOREIGN KEY (habit_id) REFERENCES habits(id))''')
+    
+    test_conn.commit()
+    
+    yield test_conn
+    
+    # Cleanup
+    test_conn.close()
+    os.close(fd)
+    os.unlink(path) 

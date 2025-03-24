@@ -89,14 +89,37 @@ To install Habit Tracker , follow these steps:
 - `4` - Delete habit
 - `5` - Track habit
 - `6` - View analytics
+- `7` - Generate predefined test data
 - `0` - Logout
 - `exit/quit` - Exit application
 
+
 ### Analytics Commands
+- `0` - Go back to main menu
 - `1` - View tracked habits
 - `2` - View habits by periodicity
 - `3` - View longest streak across all habits
 - `4` - View streak for specific habit
+
+### Test Data Generation
+The application includes a test data generator that creates 4 weeks of sample tracking data:
+
+```bash
+# From the main menu, select option 7 to generate test data
+```
+
+1. Log into the application
+2. Select option 7 from the main menu
+3. Test data will be generated with various streak patterns
+4. Use the analytics features to explore the generated data
+
+Generated test data includes:
+- Drink Water: Perfect week patterns and weekend variations
+- Gym: MWF workout patterns
+- Read: Progressive improvement pattern
+- Meditate: Building habit pattern
+- Church: Weekly attendance pattern
+
 
 
 ## Testing
