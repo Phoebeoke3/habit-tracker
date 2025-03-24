@@ -84,7 +84,7 @@ Assuming you have python installed already, all you have to do is run
 
 ## Usage
 
-Once successfully register and logged in, use the commands to navigate the app
+Once successfully registered and logged in, use the commands to navigate the app
 
 ### Main Commands
 - `1` - View all habits
