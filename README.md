@@ -5,10 +5,10 @@ Habit Tracker is a command-line interface (CLI) application that allows users to
 ## Features
 
 - User authentication: Users can create an account and log in to access their habits.
-
-- Habit creation: Users can create new habits and set goals and reminders for each habit.
+- Predefined habits: Application comes with 5 predefined habits.
+- Habit creation: Users can create new habits and set goals for each habit.
 - Habit tracking: Users can mark habits as completed or incomplete on a daily or weekly basis.
-- Habit editing: Users can edit habits, change goals, and set reminders.
+- Habit editing: Users can edit habits and change goals.
 - Habit deletion: Users can delete habits if they no longer need them.
 - Interactive menu: The application provides a user-friendly menu for navigation and interaction.
 - Command-line interface: The application is designed to be run from the command line, making it easy to use and accessible for users.
@@ -67,6 +67,8 @@ These test covers:
 
 - Habit creation and initialization
 
+- Habit updating
+
 - Data retrieval and filtering
 
 - Streak tracking and calculations
@@ -75,7 +77,7 @@ These test covers:
 
 - Analytics functionality
 
-- Data sorting and 
+- Data sorting 
 
 - Error handling
 
