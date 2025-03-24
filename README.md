@@ -111,6 +111,7 @@ pytest
 
 Test coverage includes:
 - Habit creation and initialization
+- Habit modification and deletion
 - Data retrieval and filtering
 - Streak tracking calculations
 - Database operations

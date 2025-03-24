@@ -189,19 +189,54 @@ def test_get_longest_streak_no_streaks(mock_db_connection):
     result = get_longest_streak(1)
     assert result == 0
 
-# def test_get_longest_streak_error(mock_db_connection):
-#     """Test error handling in get_longest_streak."""
-#     mock_conn, mock_cursor = mock_db_connection
+
+def test_edit_habit_success(mock_db_connection):
+    """Test successfully editing a habit."""
+    mock_conn, mock_cursor = mock_db_connection
     
-#     # Reset execute mock before test
-#     mock_conn.execute.reset_mock()
+    # Mock habit existence check
+    mock_cursor.fetchone.return_value = (1, "Old Name", "Old Desc", "2023-01-01", 1, 0, "daily", None)
     
-#     # Simulate database error
-#     mock_conn.execute.side_effect = Exception("Database error")
+    # Edit habit
+    edit_habit(1, "Updated Habit", "Updated Description", "weekly")
     
-#     # Patch rich_print instead of print
-#     with patch("controllers.habit_controllers.rich_print") as mock_print:
-#         result = get_longest_streak(1)
+    # Verify database operations
+    assert mock_cursor.execute.call_count == 2  # SELECT and UPDATE
+    mock_conn.commit.assert_called_once()
+
+def test_delete_habit_success(mock_db_connection):
+    """Test successfully deleting a habit."""
+    mock_conn, mock_cursor = mock_db_connection
     
-#     assert result == 0
-#     mock_print.assert_called_once_with("[red]Error fetching highest streak: Database error[/red]") 
+    # Delete habit
+    delete_habit(1)
+    
+    # Verify database operations
+    mock_conn.execute.assert_called_once_with(
+        "DELETE FROM habits WHERE id = ?", (1,)
+    )
+    mock_conn.commit.assert_called_once()
+
+def test_edit_habit_not_found(mock_db_connection):
+    """Test editing a non-existent habit."""
+    mock_conn, mock_cursor = mock_db_connection
+    
+    # Mock habit not found
+    mock_cursor.fetchone.return_value = None
+    
+    with pytest.raises(Exception) as exc_info:
+        edit_habit(999, "Updated Habit", "Updated Description", "weekly")
+    
+    assert str(exc_info.value) == "Habit with ID 999 not found"
+
+def test_edit_habit_invalid_periodicity(mock_db_connection):
+    """Test editing a habit with invalid periodicity."""
+    mock_conn, mock_cursor = mock_db_connection
+    
+    # Mock habit existence check
+    mock_cursor.fetchone.return_value = (1, "Old Name", "Old Desc", "2023-01-01", 1, 0, "daily", None)
+    
+    with pytest.raises(ValueError) as exc_info:
+        edit_habit(1, "Updated Habit", "Updated Description", "invalid_period")
+    
+    assert str(exc_info.value) == "Periodicity must be one of: daily, weekly, monthly, yearly" 
