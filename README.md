@@ -4,16 +4,37 @@ Habit Tracker is a command-line interface (CLI) application that allows users to
 
 ## Features
 
-- User authentication: Users can create an account and log in to access their habits.
-- Predefined habits: Application comes with 5 predefined habits.
-- Habit creation: Users can create new habits and set goals for each habit.
-- Habit tracking: Users can mark habits as completed or incomplete on a daily or weekly basis.
-- Habit editing: Users can edit habits and change goals.
-- Habit deletion: Users can delete habits if they no longer need them.
-- Interactive menu: The application provides a user-friendly menu for navigation and interaction.
-- Command-line interface: The application is designed to be run from the command line, making it easy to use and accessible for users.
-- User-friendly interface: The application provides a clear and easy-to-use interface for users to create, edit, and track habits.
-- Database integration: The application uses a SQLite database to store user data and habits.
+### User Management
+- Secure user authentication system
+- Individual user profiles
+- Predefined habit templates for new users
+
+### Habit Management
+- Create, edit, and delete habits
+- Mark habits as complete/incomplete
+- Daily and weekly habit tracking
+- Customizable habit descriptions
+- Streak tracking system
+
+### Analytics
+- View currently tracked habits
+- Filter habits by periodicity
+- Track longest running streaks
+- Analyse habit completion patterns
+
+### Interface
+- User-friendly CLI with coloured output
+- Interactive menu system
+- Clear command structure
+- Real-time feedback
+
+
+## Technical Requirements
+
+- Python 3.7+
+- SQLite3
+- Virtual Environment
+
 
 ## Installation
 
@@ -59,26 +80,71 @@ To install Habit Tracker , follow these steps:
     python main.py
     ```
 
+## Usage
+
+### Main Commands
+- `1` - View all habits
+- `2` - Add new habit
+- `3` - Edit habit
+- `4` - Delete habit
+- `5` - Track habit
+- `6` - View analytics
+- `0` - Logout
+- `exit/quit` - Exit application
+
+### Analytics Commands
+- `1` - View tracked habits
+- `2` - View habits by periodicity
+- `3` - View longest streak across all habits
+- `4` - View streak for specific habit
+
+
 ## Testing
 
 For testing, a unittest file has been created which can be run by running pytest from the command line.
 
-These test covers:
 
+Run tests using pytest:
+```bash
+pytest
+```
+
+Test coverage includes:
 - Habit creation and initialization
-
-- Habit updating
-
 - Data retrieval and filtering
-
-- Streak tracking and calculations
-
+- Streak tracking calculations
 - Database operations
-
 - Analytics functionality
-
-- Data sorting 
-
 - Error handling
+- Integration testing
 
-- Date/time handling
+## Project Structure
+```
+habit-tracker/
+├── controllers/
+│   ├── auth_controllers.py
+│   ├── habit_controllers.py
+│   └── analytics.py
+├── models/
+│   ├── habit.py
+│   └── user.py
+├── views/
+│   ├── auth_views.py
+│   ├── habit_views.py
+│   ├── analytics_views.py
+│   └── main_views.py
+├── tests/
+│   ├── conftest.py
+│   ├── test_integration.py
+│   └── test_analytics.py
+├── db.py
+├── main.py
+└── requirements.txt
+```
+
+## Dependencies
+- rich: Terminal formatting and tables
+- pytest: Testing framework
+- python-dotenv: Environment variable management
+- pwinput: Secure password input
+- sqlite3: Database management
