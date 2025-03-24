@@ -126,44 +126,82 @@ def test_mark_done_continuing_streak(mock_db_connection):
     mock_conn, mock_cursor = mock_db_connection
     
     # Mock habit data with existing streak
-    # Use a date from several days ago to avoid "already completed today" message
     last_completed = (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')
     mock_habit = (1, "Test Habit", "Test Description", "2023-01-01", 1, 5, "daily", last_completed)
     mock_cursor.fetchone.return_value = mock_habit
     
+    # Reset commit call count before test
+    mock_conn.commit.reset_mock()
+    
     # Mark habit done
     with patch("builtins.print"):
         with patch("controllers.habit_controllers.datetime") as mock_datetime:
-            # Set current date to a different day than last completion
             mock_datetime.now.return_value = datetime.now()
             mock_datetime.strptime.return_value = datetime.strptime(last_completed, '%Y-%m-%d %H:%M:%S')
             mark_done(1)
     
-    # Verify database operations - check conn.execute instead of cursor.execute
+    # Verify database operations
     assert mock_conn.execute.call_count >= 2  # At least 2 calls (SELECT and UPDATE)
-    mock_conn.commit.assert_called_once()
+    mock_conn.commit.assert_called_once()  # Should only commit once
 
 def test_get_longest_streak(mock_db_connection):
-    """Test getting the longest streak for a habit."""
+    """Test getting longest streak considering both current and broken streaks."""
     mock_conn, mock_cursor = mock_db_connection
     
-    # Mock completion dates
-    mock_dates = [
-        ("2023-01-01 12:00:00",),
-        ("2023-01-02 12:00:00",),
-        ("2023-01-03 12:00:00",),
-        ("2023-01-05 12:00:00",),  # Gap here
-        ("2023-01-06 12:00:00",)
+    # Test case 1: Current streak is higher
+    mock_conn.execute.return_value = mock_cursor
+    mock_cursor.fetchone.side_effect = [
+        (5,),  # Current streak from habits table
+        (3,),  # Max broken streak from streak_count table
     ]
-    mock_cursor.fetchall.return_value = mock_dates
     
-    # Get longest streak
-    with patch("controllers.habit_controllers.datetime") as mock_datetime:
-        mock_datetime.strptime.side_effect = lambda date, fmt: datetime.strptime(date, fmt)
-        longest_streak = get_longest_streak(1)
+    result = get_longest_streak(1)
+    assert result == 5
     
-    # Verify database operation
-    mock_conn.execute.assert_called_once()
+    # Verify correct SQL queries were executed
+    assert mock_conn.execute.call_count == 2
+    mock_conn.execute.assert_any_call("SELECT streak_count FROM habits WHERE id = ?", (1,))
+    mock_conn.execute.assert_any_call("SELECT MAX(count) FROM streak_count WHERE habit_id = ?", (1,))
+
+def test_get_longest_streak_broken_higher(mock_db_connection):
+    """Test getting longest streak when broken streak is higher."""
+    mock_conn, mock_cursor = mock_db_connection
     
-    # Verify returned streak
-    assert longest_streak == 3  # The first 3 dates are consecutive 
+    mock_conn.execute.return_value = mock_cursor
+    mock_cursor.fetchone.side_effect = [
+        (3,),  # Current streak from habits table
+        (7,),  # Max broken streak from streak_count table
+    ]
+    
+    result = get_longest_streak(1)
+    assert result == 7
+
+def test_get_longest_streak_no_streaks(mock_db_connection):
+    """Test getting longest streak when no streaks exist."""
+    mock_conn, mock_cursor = mock_db_connection
+    
+    mock_conn.execute.return_value = mock_cursor
+    mock_cursor.fetchone.side_effect = [
+        None,  # No current streak
+        (None,),  # No broken streaks
+    ]
+    
+    result = get_longest_streak(1)
+    assert result == 0
+
+# def test_get_longest_streak_error(mock_db_connection):
+#     """Test error handling in get_longest_streak."""
+#     mock_conn, mock_cursor = mock_db_connection
+    
+#     # Reset execute mock before test
+#     mock_conn.execute.reset_mock()
+    
+#     # Simulate database error
+#     mock_conn.execute.side_effect = Exception("Database error")
+    
+#     # Patch rich_print instead of print
+#     with patch("controllers.habit_controllers.rich_print") as mock_print:
+#         result = get_longest_streak(1)
+    
+#     assert result == 0
+#     mock_print.assert_called_once_with("[red]Error fetching highest streak: Database error[/red]") 

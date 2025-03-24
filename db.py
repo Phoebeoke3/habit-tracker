@@ -32,9 +32,10 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS habits
     last_completed_date text,
     FOREIGN KEY (user_id) REFERENCES users(id))''')
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS habit_completions 
+cursor.execute('''CREATE TABLE IF NOT EXISTS streak_count 
     (id INTEGER PRIMARY KEY AUTOINCREMENT,
     habit_id INTEGER NOT NULL,
+    count INTEGER,
     last_completed_date TEXT NOT NULL,
     FOREIGN KEY (habit_id) REFERENCES habits(id))''')
 

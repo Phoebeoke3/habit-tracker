@@ -46,14 +46,14 @@ def tracked_habits_view(user_id):
     '''This function shows the table of currently tracked user habits'''
 
     habits = get_all_tracked_habits(user_id)
-    table = Table(title="Habits", show_lines=True, leading=1, row_styles=["dim", ""])
+    table = Table(title="Habits", show_lines=True, leading=1, row_styles=[""])
     table.add_column("ID", justify="right", style="cyan", no_wrap=True)
-    table.add_column("Name")
-    table.add_column("Description")
-    table.add_column("Start date")
-    table.add_column("Streak count")
-    table.add_column("Periodicity")
-    table.add_column("Last Completed Date")
+    table.add_column("Name", style="magenta")
+    table.add_column("Description", style="green")
+    table.add_column("Start date", justify="center", style="blue")
+    table.add_column("Streak Count", justify="center", style="yellow")
+    table.add_column("Periodicity", justify="center", style="blue")
+    table.add_column("Last Completed Date", justify="center", style="yellow")
     for habit in habits:
         table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6], habit[7])
     print(table)
@@ -69,14 +69,14 @@ def habit_periodicity_view(user_id):
 
     try:
         habits = all_habits_by_periodicity(user_id, periodicity)
-        table = Table(title=f"{periodicity.capitalize()} Habit(s)", show_lines=True, leading=1, row_styles=["dim", ""])
+        table = Table(title=f"{periodicity.capitalize()} Habit(s)", show_lines=True, leading=1, row_styles=[""])
         table.add_column("ID", justify="right", style="cyan", no_wrap=True)
-        table.add_column("Name")
-        table.add_column("Description")
-        table.add_column("Start date")
-        table.add_column("Streak count")
-        table.add_column("Periodicity")
-        table.add_column("Last Completed Date")
+        table.add_column("Name", style="magenta")
+        table.add_column("Description", style="green")
+        table.add_column("Start date", justify="center", style="blue")
+        table.add_column("Streak Count", justify="center", style="yellow")
+        table.add_column("Periodicity", justify="center", style="blue")
+        table.add_column("Last Completed Date", justify="center", style="yellow")
         for habit in habits:
             table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6], habit[7])
         print(table)
@@ -105,11 +105,6 @@ def longest_habit_streak_view(user_id):
 
         console.print(table)
        
-        # print("[cyan]Name:[/cyan]", habit[1], sep="\t")
-        # print("[cyan]Description:[/cyan]", habit[2], sep="\t")
-        # print("[cyan]Date:[/cyan]", habit[3], sep="\t")
-        # print("[cyan]Streak Count:[/cyan]", habit[5], sep="\t")
-        # input()
     except Exception as e:
         print(f"[red]{e}[/red]")
     input("Press ENTER to continue")

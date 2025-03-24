@@ -2,6 +2,8 @@
 A module containing all habit controllers (funtions that processes habit data)
 """
 
+import json
+import os
 from db import conn
 from rich.table import Table
 from rich.console import Console
@@ -38,6 +40,19 @@ def get_habits_by_user_id(user_id):
         sql = "SELECT * FROM habits WHERE user_id = ? OR user_id IS NULL"
         cursor = conn.execute(sql, (user_id,))
         habits = cursor.fetchall()
+        updated_habits = []
+
+        # for habit in habits:
+        #     try:
+        #         obj = update_habit_streak(habit_id=habit[0], streak_count=habit[5], last_completed_date=habit[7], periodicity=habit[6])
+        #         habit_list = list(habit)
+        #         habit_list[5] = obj["streak_count"]
+        #         habit_list[6] = obj["periodicity"]
+        #         habit_list[7] = obj["last_completed_date"]
+        #         updated_habits.append(tuple(habit_list))
+        #     except:
+        #         updated_habits.append(habit)
+
         return habits
     except Exception as e:
         raise Exception(f"Error fetching habits for User ID {user_id}: {str(e)}")
@@ -122,90 +137,169 @@ def mark_done(habit_id):
     sql = "SELECT * FROM habits WHERE id = ?"
     cursor = conn.execute(sql, (habit_id,))
     habit = cursor.fetchone()
-    if habit is None:  # ✅ Prevent NoneType error
+    if habit is None:  #Prevent NoneType error
         print(f"[red]Habit with ID {habit_id} not found. Please check the habit ID and try again.[/red]")
         return  # Stop execution if habit does not exist
     
     streak_count = habit[5]
-    periodicity = habit[6]  # Fixed typo here
+    periodicity = habit[6]  
     last_completed_date = habit[7]
-    period = {
-        "daily": 1,
-        "weekly": 7,
-        "monthly": 30,
-        "yearly": 365
-    }
-    
-    # If no previous completion date or streak is 0, start a new streak
-    if streak_count == 0 or last_completed_date is None:
-        streak_count = 1
-    else:
-        try:
-            # Try to parse the datetime - handle potential format variations
-            try:
-                last_date = datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')
-            except ValueError:
-                # Alternative format without microseconds
-                last_date = datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S')
-                
-            days_since_completion = (datetime.now() - last_date).days
-            
-            # Within period - already completed
-            if days_since_completion < 1:
-                print("[yellow]Habit already completed today![/yellow]")
-                return
-                
-            # Completed within period - continue streak
-            elif days_since_completion <= period[periodicity]:
-                streak_count += 1
-                
-            # Missed one period but not two - reset streak
-            elif days_since_completion <= period[periodicity] * 2:
-                streak_count = 1
-                
-            # Missed more than two periods - reset streak
-            else:
-                streak_count = 1
-                
-        except Exception as e:
-            print(f"[red]Error processing date: {e}[/red]")
-            # Start a new streak if there's any date parsing issue
-            streak_count = 1
-    
-    # Update the database
-    sql = "UPDATE habits SET streak_count = ?, last_completed_date = ? WHERE id = ?"
-    conn.execute(sql, (streak_count, datetime.now(), habit_id))
-    conn.commit()
-    
-    print(f"[green]Habit marked as done! Current streak: {streak_count}[/green]")
 
+    update_habit_streak(habit_id=habit_id, streak_count=streak_count, last_completed_date=last_completed_date, periodicity=periodicity, active_update=True)
+   
 
+# def get_longest_streak(habit_id):
+#     '''Returns the longest consecutive streak for a given habit'''
+
+#     # Fetch all completion dates for the habit, sorted in ascending order
+#     sql = "SELECT last_completed_date FROM streak_count WHERE habit_id = ? ORDER BY last_completed_date ASC"
+#     cursor = conn.execute(sql, (habit_id,))
+#     completion_dates = [row[0] for row in cursor.fetchall()]
+
+#     if not completion_dates:
+#         return 0  # No recorded completions
+
+#     # Convert string dates to datetime objects
+#     completion_dates = [datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f') for date in completion_dates]
+
+#     longest_streak = 1
+#     current_streak = 1
+
+#     # Iterate through completion dates to check consecutive days
+#     for i in range(1, len(completion_dates)):
+#         if (completion_dates[i] - completion_dates[i - 1]).days == 1:  # Consecutive days
+#             current_streak += 1
+#             longest_streak = max(longest_streak, current_streak)
+#         else:
+#             current_streak = 1  # Reset streak if a gap exists
+
+#     return longest_streak
 
 def get_longest_streak(habit_id):
-    '''Returns the longest consecutive streak for a given habit'''
+    '''Returns the highest streak ever for a habit, including current and broken streaks'''
+    try:
+        # Get current streak
+        sql_current = "SELECT streak_count FROM habits WHERE id = ?"
+        cursor = conn.execute(sql_current, (habit_id,))
+        result = cursor.fetchone()
+        
+        # Handle case where habit doesn't exist
+        if result is None:
+            return 0
+            
+        current_streak = result[0]
 
-    # Fetch all completion dates for the habit, sorted in ascending order
-    sql = "SELECT last_completed_date FROM habit_completions WHERE habit_id = ? ORDER BY last_completed_date ASC"
-    cursor = conn.execute(sql, (habit_id,))
-    completion_dates = [row[0] for row in cursor.fetchall()]
+        # Get max broken streak from streak_count table
+        sql_broken = "SELECT MAX(count) FROM streak_count WHERE habit_id = ?"
+        cursor = conn.execute(sql_broken, (habit_id,))
+        result = cursor.fetchone()
+        
+        # Handle case where no broken streaks exist
+        if result is None or result[0] is None:
+            return current_streak
+            
+        max_broken_streak = result[0]
+        
+        # Return the highest of both
+        return max(current_streak, max_broken_streak)
+    
+    except Exception as e:
+        print(f"[red]Error fetching highest streak: {e}[/red]")
+        return 0
 
-    if not completion_dates:
-        return 0  # No recorded completions
 
-    # Convert string dates to datetime objects
-    completion_dates = [datetime.strptime(date, '%Y-%m-%d %H:%M:%S') for date in completion_dates]
-
-    longest_streak = 1
-    current_streak = 1
-
-    # Iterate through completion dates to check consecutive days
-    for i in range(1, len(completion_dates)):
-        if (completion_dates[i] - completion_dates[i - 1]).days == 1:  # Consecutive days
-            current_streak += 1
-            longest_streak = max(longest_streak, current_streak)
+def update_habit_streak(habit_id, streak_count, last_completed_date, periodicity, active_update=False):
+    '''This function checks and update the streak count'''
+    try:
+        period = {
+            "daily": 1,
+            "weekly": 7,
+            "monthly": 30,
+            "yearly": 365
+        }
+        
+        # If no previous completion date or streak is 0, start a new streak
+        if active_update and streak_count == 0 or last_completed_date is None:
+            streak_count = 1
         else:
-            current_streak = 1  # Reset streak if a gap exists
+            try:
+                # Try to parse the datetime - handle potential format variations
+                try:
+                    last_date = datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S.%f')
+                except ValueError:
+                    last_date = datetime.strptime(last_completed_date, '%Y-%m-%d %H:%M:%S')
+                
+                days_since_completion = (datetime.now() - last_date).days
+                
+                # Within period - already completed
+                if active_update and days_since_completion < period[periodicity]:
+                    print("[yellow]Habit already completed![/yellow]")
+                    return
+                    
+                # Completed within period - continue streak
+                elif active_update and days_since_completion >= period[periodicity] and days_since_completion < period[periodicity] * 2:
+                    streak_count += 1
+                    
+                elif days_since_completion >= period[periodicity] * 2:
+                    # Save the broken streak before resetting
+                    try:
+                        conn.execute(
+                            "INSERT INTO streak_count (habit_id, count, last_completed_date) VALUES (?, ?, ?)",
+                            (habit_id, streak_count, last_completed_date)
+                        )
+                        # Remove the commit here since we'll commit everything at once
+                        print(f"[red]Streak broken! Logged a streak of {streak_count} days.[/red]")
+                    except Exception as e:
+                        print(f"[red]Error saving to streak_count table: {e}[/red]")
+                    
+                    streak_count = 0  # Reset streak
+                    
+            except Exception as e:
+                print(f"[red]Error processing date: {e}[/red]")
+                
+        # Update the habit's streak count and last completed date
+        sql = "UPDATE habits SET streak_count = ?, last_completed_date = ? WHERE id = ?"
+        conn.execute(sql, (streak_count, datetime.now(), habit_id))
+        
+        # Single commit for all database operations
+        conn.commit()
+        
+        if active_update:
+            print(f"[green]Habit marked as done! Current streak: {streak_count}[/green]")
+            
+        return {
+            "streak_count": streak_count,
+            "last_completed_date": last_completed_date,
+            "periodicity": periodicity
+        }
+            
+    except Exception as e:
+        print(f"[red]Error updating streak: {e}[/red]")
+        return None
 
-    return longest_streak
 
 
+# File to store streak data
+DATA_FILE = 'streak_data.json'
+
+# Load or initialize data
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    return {
+        'current_streak': 0,
+        'last_date': None,
+        'broken_streaks': []
+    }
+
+# Save data to file
+def save_data(data):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+
+def get_broken_streaks(habit_id):
+    '''Returns all broken streaks for a habit'''
+    sql = "SELECT broken_at, streak_count FROM broken_streaks WHERE habit_id = ? ORDER BY broken_at DESC"
+    cursor = conn.execute(sql, (habit_id,))
+    return cursor.fetchall()

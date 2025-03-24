@@ -17,13 +17,18 @@ def habits_view(user_id):
     '''This function shows the table of current user habits'''
 
     habits = get_habits_by_user_id(user_id)
-    table = Table(title="Habits", show_lines=True, leading=1, row_styles=["dim", ""])
+    table = Table(title="Habits", show_lines=True, leading=1, row_styles=[""])
     table.add_column("ID", justify="right", style="cyan", no_wrap=True)
-    table.add_column("Name")
-    table.add_column("Description")
-    table.add_column("Start date")
-    table.add_column("Streak count")
-    table.add_column("Periodicity")
+    # table.add_column("Name")
+    # table.add_column("Description")
+    # table.add_column("Streak count")
+    # table.add_column("Periodicity")
+    table.add_column("Name", style="magenta")
+    table.add_column("Description", style="green")
+    table.add_column("Start date", justify="center", style="blue")
+    table.add_column("Streak Count", justify="center", style="yellow")
+    table.add_column("Periodicity", justify="center", style="blue")
+
     for habit in habits:
         table.add_row(str(habit[0]), habit[1], habit[2], habit[3], str(habit[5]), habit[6])
     print(table)
@@ -56,7 +61,7 @@ def edit_habit_view(user_id):
     habit = get_habit(habit_id)
     if habit is None:
         print(f"[red]Habit with ID {habit_id} not found.[/red]")
-        return None  # ✅ Prevent returning None
+        return None  # Prevent returning None
 
     print("\nEditing habit:")
     print(f"ID: {habit['id']}")
@@ -71,7 +76,7 @@ def edit_habit_view(user_id):
     edit_habit(habit_id, name, description, periodicity)
     print(f"[green]Habit {habit_id} updated successfully![/green]")
 
-    return periodicity  # ✅ Always return periodicity
+    return periodicity  # Always return periodicity
 
 
 
@@ -86,7 +91,7 @@ def delete_habit_view(user_id):
         print("[red]Invalid habit ID entered.[/red]")
         return
 
-    if not get_habit(habit_id):  # ✅ Ensure habit exists before deleting
+    if not get_habit(habit_id):  # Ensure habit exists before deleting
         print(f"[red]Habit with ID {habit_id} not found.[/red]")
         return
 
