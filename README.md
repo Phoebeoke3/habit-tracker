@@ -2,6 +2,23 @@
 
 Habit Tracker is a command-line interface (CLI) application that allows users to create, edit, and track habits. It provides a user-friendly interface for managing periodic tasks and habits.
 
+## Table of Contents
+- [Features](#features)
+  - [User Management](#user-management)
+  - [Habit Management](#habit-management)
+  - [Analytics](#analytics)
+  - [Interface](#interface)
+- [Technical Requirements](#technical-requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Main Commands](#main-commands)
+  - [Analytics Commands](#analytics-commands)
+  - [Test Data Generation](#test-data-generation)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Dependencies](#dependencies)
+
+
 ## Features
 
 ### User Management
