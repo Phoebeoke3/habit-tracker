@@ -86,7 +86,7 @@ def habit_periodicity_view(user_id):
     return
 
 def longest_habit_streak_view(user_id):
-    '''This function view that return the longest run streak of all defined habits'''
+    '''This function view return the longest run streak of all defined habits'''
 
     console.rule("[cyan]Habit with longest streak[/cyan]")
 
@@ -111,7 +111,7 @@ def longest_habit_streak_view(user_id):
     return
 
 def view_longest_streak(user_id):
-    '''This function view that return the longest run streak of a given habit'''
+    '''This is the function view that return the longest run streak of a given habit'''
 
     console.rule("[cyan]Longest streak[/cyan]")
     # Fetch all habits for the user

@@ -136,7 +136,7 @@ def edit_habit(habit_id, name, description, periodicity):
     }
 
 def mark_done(habit_id):
-    '''This is the controller function mark a habit as done'''
+    '''This is the controller function that marks a habit as done'''
 
     sql = "SELECT * FROM habits WHERE id = ?"
     cursor = conn.execute(sql, (habit_id,))

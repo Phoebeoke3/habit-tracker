@@ -19,10 +19,6 @@ def habits_view(user_id):
     habits = get_habits_by_user_id(user_id)
     table = Table(title="Habits", show_lines=True, leading=1, row_styles=[""])
     table.add_column("ID", justify="right", style="cyan", no_wrap=True)
-    # table.add_column("Name")
-    # table.add_column("Description")
-    # table.add_column("Streak count")
-    # table.add_column("Periodicity")
     table.add_column("Name", style="magenta")
     table.add_column("Description", style="green")
     table.add_column("Start date", justify="center", style="blue")
@@ -35,7 +31,7 @@ def habits_view(user_id):
     input("Press ENTER to continue")
 
 def add_habit_view(user_id):
-    '''This function add habits to user'''
+    '''This function is the add habits to user view'''
 
     console.clear()
     console.rule("[bold]Add Habit[/bold]")
@@ -81,7 +77,7 @@ def edit_habit_view(user_id):
 
 
 def delete_habit_view(user_id):
-    '''This function deletes a user habit'''
+    '''This function is the deletes a user habit view'''
 
     habits_view(user_id)
     console.rule("[bold]Delete Habit[/bold]")
@@ -102,7 +98,7 @@ def delete_habit_view(user_id):
         print(f"[red]Error deleting habit: {e}[/red]")
 
 def track_habit_view(user_id):
-    '''This function tracks the user habit'''
+    '''This function is the view that tracks the user habit'''
     
     habits_view(user_id)
     console.rule("[bold]Track Habit[/bold]")
