@@ -93,11 +93,11 @@ To install Habit Tracker , follow these steps:
 
 5. Run the application: 
 
-Assuming you have python installed already all you have to do is run
+    Assuming you have python installed already all you have to do is run
 
-```bash
-python main.py
-```
+    ```bash
+    python main.py
+    ```
 
 
 ## Usage
